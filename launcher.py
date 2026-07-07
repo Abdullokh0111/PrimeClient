@@ -79,6 +79,24 @@ def install_portable_jdk(progress_callback, status_callback):
     
     return os.path.join(jdk_dir, "bin", "javaw.exe")
 
+def get_modrinth_download_url(project_slug, mc_version):
+    """ Fetch the direct CDN download URL for a mod on Modrinth """
+    try:
+        url = f"https://api.modrinth.com/v2/project/{project_slug}/version"
+        req = urllib.request.Request(
+            url,
+            headers={'User-Agent': 'PrimeClientLauncher/1.0'}
+        )
+        with urllib.request.urlopen(req) as response:
+            versions = json.loads(response.read().decode())
+            for v in versions:
+                if mc_version in v["game_versions"] and "fabric" in v["loaders"]:
+                    file_info = v["files"][0]
+                    return file_info["url"], file_info["filename"]
+    except Exception as e:
+        print(f"Modrinth API error for {project_slug}: {e}")
+    return None, None
+
 class LauncherGUI:
     def __init__(self, root):
         self.root = root
@@ -350,16 +368,38 @@ class LauncherGUI:
 
             # 3. Handle Fabric / Fabric API dependencies if needed
             target_fabric_api = os.path.join(mods_dir, "fabric-api-0.92.0+1.20.1.jar")
+            opt_mods = ["sodium", "iris", "lithium", "indium", "zoomify", "lambdynamiclights"]
             if is_fabric:
                 if not os.path.exists(target_fabric_api):
                     self.set_status("Downloading Fabric API dependency...", self.accent_color)
                     def reporthook(count, block_size, total_size):
                         self.set_progress(count * block_size, total_size)
                     urllib.request.urlretrieve(FABRIC_API_URL, target_fabric_api, reporthook)
+
+                # Download OptiFine alternative optimization mods
+                for slug in opt_mods:
+                    existing = [f for f in os.listdir(mods_dir) if f.lower().startswith(slug)]
+                    if not existing:
+                        self.set_status(f"Fetching {slug} on Modrinth...", self.accent_color)
+                        url, filename = get_modrinth_download_url(slug, vanilla_version)
+                        if url and filename:
+                            self.set_status(f"Downloading {slug} (OptiFine Alternative)...", self.accent_color)
+                            def reporthook(count, block_size, total_size):
+                                self.set_progress(count * block_size, total_size)
+                            target_path = os.path.join(mods_dir, filename)
+                            urllib.request.urlretrieve(url, target_path, reporthook)
             else:
                 # Remove Fabric API if playing vanilla
                 if os.path.exists(target_fabric_api):
                     os.remove(target_fabric_api)
+                # Remove optimization mods if playing vanilla
+                for slug in opt_mods:
+                    for f in os.listdir(mods_dir):
+                        if f.lower().startswith(slug):
+                            try:
+                                os.remove(os.path.join(mods_dir, f))
+                            except:
+                                pass
 
             # 4. Install Minecraft Base Version if missing
             self.set_status(f"Installing Minecraft {vanilla_version}...", self.accent_color)
