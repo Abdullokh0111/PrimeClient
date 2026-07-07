@@ -1,0 +1,33 @@
+# Java / Gradle Build
+.gradle/
+build/
+bin/
+run/
+*.class
+
+# PyInstaller / Python Build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+dist/
+*.spec
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local launcher configurations
+launcher_settings.json
+launcher_bg.png
+jdk17.zip
+jdk_temp/

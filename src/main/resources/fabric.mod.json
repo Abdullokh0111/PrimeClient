@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "prime",
+  "version": "${version}",
+  "name": "Prime",
+  "description": "A custom client mod with auto swap and utilities.",
+  "authors": [
+    "Prime Devs"
+  ],
+  "contact": {
+    "homepage": "https://example.com/",
+    "sources": "https://example.com/"
+  },
+  "license": "MIT",
+  "icon": "assets/prime/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.prime.client.PrimeClient"
+    ]
+  },
+  "mixins": [
+    "prime.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}
