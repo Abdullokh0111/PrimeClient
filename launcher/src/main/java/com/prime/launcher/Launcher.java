@@ -24,6 +24,18 @@ public class Launcher {
             gd.mkdirs();
         }
 
+        // Setup global error logging to file
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            try (java.io.PrintWriter pw = new java.io.PrintWriter(new FileWriter(new File(GAME_DIR, "error.log"), true))) {
+                pw.println("=== UNCAUGHT EXCEPTION IN THREAD: " + thread.getName() + " ===");
+                throwable.printStackTrace(pw);
+                pw.println();
+                pw.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         // Load settings
         loadSettings();
 
