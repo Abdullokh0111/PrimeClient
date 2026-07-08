@@ -73,7 +73,7 @@ public class GameLauncher {
             }
 
             // Download OptiFine alternative optimization mods
-            String[] optMods = {"sodium", "iris", "lithium", "indium", "zoomify", "lambdynamiclights"};
+            String[] optMods = {"sodium", "iris", "lithium", "indium", "zoomify", "lambdynamiclights", "fabric-language-kotlin", "yacl"};
             for (String slug : optMods) {
                 // Check if mod exists
                 boolean exists = false;
@@ -100,7 +100,7 @@ public class GameLauncher {
             if (fabricApiFile.exists()) {
                 fabricApiFile.delete();
             }
-            String[] optMods = {"sodium", "iris", "lithium", "indium", "zoomify", "lambdynamiclights"};
+            String[] optMods = {"sodium", "iris", "lithium", "indium", "zoomify", "lambdynamiclights", "fabric-language-kotlin", "yacl"};
             File[] modFiles = modsDir.listFiles();
             if (modFiles != null) {
                 for (File f : modFiles) {
@@ -124,7 +124,7 @@ public class GameLauncher {
 
         if (isFabric) {
             FabricVersion fabric = new FabricVersionBuilder()
-                    .withFabricVersion("0.15.11")
+                    .withFabricVersion("0.18.0")
                     .build();
             updaterBuilder.withModLoaderVersion(fabric);
         }

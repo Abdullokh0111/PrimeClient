@@ -20,9 +20,15 @@ application {
     mainClass = 'com.prime.launcher.Launcher'
 }
 
+// The GUI uses non-ASCII glyphs (◆, •) and the project has Cyrillic strings,
+// so pin the source encoding instead of relying on the platform default.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 processResources {
     // Automatically copy the compiled mod jar from root project into launcher resources
-    dependsOn ':jar'
+    dependsOn ':remapJar'
     from('../build/libs') {
         include 'prime-1.0.0.jar'
     }
