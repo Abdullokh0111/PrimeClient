@@ -171,10 +171,21 @@ public class GameLauncher {
             javaExe = "javaw.exe"; // Fallback to PATH
         }
 
-        // Get fabric version ID
+        // Get fabric version ID — detect dynamically from what FlowUpdater installed
         String versionId = vanillaVersion;
         if (isFabric) {
-            versionId = "fabric-loader-0.15.11-" + vanillaVersion;
+            File versionsDir = new File(Launcher.GAME_DIR, "versions");
+            if (versionsDir.exists()) {
+                File[] dirs = versionsDir.listFiles();
+                if (dirs != null) {
+                    for (File d : dirs) {
+                        if (d.isDirectory() && d.getName().startsWith("fabric-loader-") && d.getName().endsWith(vanillaVersion)) {
+                            versionId = d.getName();
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         // Classpath construction
