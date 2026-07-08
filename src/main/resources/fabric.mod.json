@@ -8,8 +8,9 @@
     "Prime Devs"
   ],
   "contact": {
-    "homepage": "https://example.com/",
-    "sources": "https://example.com/"
+    "homepage": "https://github.com/Abdullokh0111/PrimeClient",
+    "sources": "https://github.com/Abdullokh0111/PrimeClient",
+    "issues": "https://github.com/Abdullokh0111/PrimeClient/issues"
   },
   "license": "MIT",
   "icon": "assets/prime/icon.png",

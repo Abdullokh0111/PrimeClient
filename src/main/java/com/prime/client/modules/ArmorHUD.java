@@ -1,5 +1,6 @@
 package com.prime.client.modules;
 
+import com.prime.client.api.Module;
 import com.prime.client.config.ConfigManager;
 import com.prime.client.config.ModConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,14 +19,17 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorHUD {
+public class ArmorHUD implements Module {
     private static final Logger LOGGER = LoggerFactory.getLogger("prime-armorhud");
-    private static int warningCooldown = 0;
+    private int warningCooldown = 0;
 
-    public static void init() {
-        LOGGER.info("Initializing Armor HUD...");
+    @Override
+    public String getName() {
+        return "ArmorHUD";
+    }
 
-        // Register tick listener to monitor durability and play alert sounds
+    @Override
+    public void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) {
                 warningCooldown = 0;
@@ -41,7 +45,6 @@ public class ArmorHUD {
                 warningCooldown--;
             }
 
-            // Check equipped armor pieces
             boolean lowDurabilityDetected = false;
             PlayerEntity player = client.player;
 
@@ -59,7 +62,6 @@ public class ArmorHUD {
 
             if (lowDurabilityDetected && warningCooldown == 0) {
                 LOGGER.info("Low durability alert triggered!");
-                // Play warning sound (Note block pling, high pitch)
                 player.playSound(
                         SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
                         SoundCategory.PLAYERS,
@@ -70,7 +72,6 @@ public class ArmorHUD {
             }
         });
 
-        // Register HUD rendering
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player == null || client.options.hudHidden) {
@@ -86,7 +87,7 @@ public class ArmorHUD {
         });
     }
 
-    private static void renderArmorHUD(DrawContext context, MinecraftClient client) {
+    private void renderArmorHUD(DrawContext context, MinecraftClient client) {
         PlayerEntity player = client.player;
         if (player == null) {
             return;
@@ -95,7 +96,6 @@ public class ArmorHUD {
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
 
-        // Items to display: Helmet, Chestplate, Leggings, Boots, Mainhand, Offhand
         List<ItemStack> items = new ArrayList<>();
         ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
         ItemStack chest = player.getEquippedStack(EquipmentSlot.CHEST);
@@ -119,8 +119,6 @@ public class ArmorHUD {
         int spacer = 4;
         int totalWidth = (items.size() * itemSize) + ((items.size() - 1) * spacer);
         int startX = (screenWidth / 2) - (totalWidth / 2);
-        
-        // Positioned 56 pixels above the bottom of the screen (safely above food/health bars)
         int y = screenHeight - 60;
 
         TextRenderer textRenderer = client.textRenderer;
@@ -129,35 +127,31 @@ public class ArmorHUD {
             ItemStack stack = items.get(i);
             int currentX = startX + (i * (itemSize + spacer));
 
-            // 1. Draw Item Icon and Vanilla decorations (durability bar, count)
             context.drawItem(stack, currentX, y);
             context.drawItemInSlot(textRenderer, stack, currentX, y);
 
-            // 2. Draw Exact Durability Value above the icon if damageable
             if (stack.isDamageable()) {
                 int maxDamage = stack.getMaxDamage();
                 int currentDamage = stack.getDamage();
                 int remaining = maxDamage - currentDamage;
                 float pct = (float) remaining / maxDamage;
 
-                // Set color based on percentage
-                int color = 0xFF55FF55; // Green
+                int color = 0xFF55FF55;
                 if (pct < 0.15F) {
-                    color = 0xFFFF5555; // Red
+                    color = 0xFFFF5555;
                 } else if (pct < 0.40F) {
-                    color = 0xFFFFAA00; // Orange
+                    color = 0xFFFFAA00;
                 } else if (pct < 0.70F) {
-                    color = 0xFFFFFF55; // Yellow
+                    color = 0xFFFFFF55;
                 }
 
                 String text = String.valueOf(remaining);
                 float textW = textRenderer.getWidth(text);
 
-                // Render tiny text (50% scale) centered above item
                 context.getMatrices().push();
                 context.getMatrices().translate(currentX + 8.0F, y - 6.0F, 0.0F);
                 context.getMatrices().scale(0.5F, 0.5F, 1.0F);
-                
+
                 context.drawTextWithShadow(
                         textRenderer,
                         text,

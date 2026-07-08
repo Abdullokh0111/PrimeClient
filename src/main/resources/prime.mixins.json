@@ -3,7 +3,11 @@
   "package": "com.prime.client.mixins",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "EntityRendererMixin"
+    "EntityRendererMixin",
+    "PlayerListHudMixin",
+    "BackgroundRendererMixin",
+    "CameraMixin",
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

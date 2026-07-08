@@ -1,10 +1,8 @@
 package com.prime.client;
 
+import com.prime.client.api.ModuleManager;
+import com.prime.client.config.ConfigManager;
 import com.prime.client.gui.ConfigScreen;
-import com.prime.client.modules.ArmorHUD;
-import com.prime.client.modules.AutoSwap;
-import com.prime.client.modules.EffectsHUD;
-import com.prime.client.modules.TargetHUD;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -24,17 +22,13 @@ public class PrimeClient implements ClientModInitializer {
     public void onInitializeClient() {
         LOGGER.info("Initializing Prime Client...");
 
-        // Initialize AutoSwap module
-        AutoSwap.init();
+        // Load configuration first - every module reads from it, so this must
+        // not depend on which module happens to init first.
+        ConfigManager.load();
 
-        // Initialize TargetHUD module
-        TargetHUD.init();
-
-        // Initialize ArmorHUD module
-        ArmorHUD.init();
-
-        // Initialize EffectsHUD module
-        EffectsHUD.init();
+        // Adding a new module now means registering it in ModuleManager,
+        // not hand-editing this method.
+        ModuleManager.initAll();
 
         // Register configuration screen keybinding (RSHIFT)
         openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
